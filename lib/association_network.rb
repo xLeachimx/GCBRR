@@ -70,7 +70,7 @@ class AssocNetwork
 	# Precond:
 	# none
 	# Postcond:
-	# creates a blank accociation network
+	# creates a blank association network
 	def initialize
 		@nodes = {}
 		@strongestConnection = 1
@@ -93,6 +93,21 @@ class AssocNetwork
 	end
 
 	# Precond:
+	# activationLevel is an integer
+	# item1 is the name of a node in the network
+	# item2 is the name of a node in the network
+	# Postcond:
+	# Returns the activation level of items2 
+	def similarityQuery activationLevel item1 item2
+		return activationLevel if item1 == item2
+		prepSid
+		sid(activationLevel,item1)
+		result = @nodes[item2].activated
+		result = 0 if result == nil
+		return result
+	end
+
+	# Precond:
 	# creates connection based on a series of symbols and/or strings in items
 	# Postcond:
 	# Adds connections to the network based on the contents of items.
@@ -105,6 +120,9 @@ class AssocNetwork
 		end
 
 		items.combination(2) do |pair|
+			# exstablish a connection if none
+			# assuming a connection is there increment the strength
+			# if needed set the strongest connection variable
 			if @nodes[pair[0]].isConnected(pair[1])
 				increment = @nodes[pair[0]].getConnectionStr(pair[1]) + 1
 				if increment > @strongestConnection
@@ -124,6 +142,23 @@ class AssocNetwork
 			else
 				@nodes[pair[1]].addConnection(pair[0])
 			end
+		end
+	end
+
+	private
+
+	def prepSid
+		@nodes.each_value{|n| n.deactivate}
+	end
+
+	def sid currentActivation, location
+		return if currentActivation <= 0
+		return if @nodes[location].activated >= currentActivation
+		@nodes[location].activate(currentActivation)
+		@nodes[location].connections.each do |connection|
+			activationLoss = @strongestConnection - connection[0] + 1
+			nextActivation = currentActivation - activationLoss
+			sid(nextActivation, connection[1].name)
 		end
 	end
 end
