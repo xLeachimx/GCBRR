@@ -147,13 +147,22 @@ class AssocNetwork
 
 	private
 
+	# Precond:
+	# None
+	# Postcond:
+	# all nodes become deactivated
 	def prepSid
 		@nodes.each_value{|n| n.deactivate}
 	end
 
+	# Precond:
+	# location is a node name where sid currently is
+	# currentActivation is the current activation level of the system
+	# Postcond:
+	# the network becomes activated
 	def sid currentActivation, location
 		return if currentActivation <= 0
-		return if @nodes[location].activated >= currentActivation
+		return if @nodes[location].activated != nil && @nodes[location].activated >= currentActivation
 		@nodes[location].activate(currentActivation)
 		@nodes[location].connections.each do |connection|
 			activationLoss = @strongestConnection - connection[0] + 1
