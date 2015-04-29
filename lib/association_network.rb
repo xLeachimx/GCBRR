@@ -73,7 +73,7 @@ class AssocNetwork
 	# creates a blank association network
 	def initialize
 		@nodes = {}
-		@strongestConnection = 1
+		@strongestConnection = 0
 	end
 
 	# Precond:
