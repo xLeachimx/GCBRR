@@ -98,7 +98,7 @@ class AssocNetwork
 	# item2 is the name of a node in the network
 	# Postcond:
 	# Returns the activation level of items2 
-	def similarityQuery activationLevel item1 item2
+	def similarityQuery activationLevel, item1, item2
 		return activationLevel if item1 == item2
 		prepSid
 		sid(activationLevel,item1)
@@ -145,6 +145,17 @@ class AssocNetwork
 		end
 	end
 
+	# Precond:
+	# cases is an array of GenCase objects as defined in generic_case.rb
+	# Postcond:
+	# adds to the association network the entire case library given
+	def addCaseLibrary cases
+		cases.each do |c|
+			addCase(c)
+		end
+	end
+
+
 	private
 
 	# Precond:
@@ -169,5 +180,18 @@ class AssocNetwork
 			nextActivation = currentActivation - activationLoss
 			sid(nextActivation, connection[1].name)
 		end
+	end
+
+	# Precond:
+	# c is a GenCase object as defined in generic_case.rb
+	# Postcond:
+	# adds to the association network the case given
+	def addCase c
+		overall = []
+		c.attributes.each_value do |vals|
+			createConnections(vals)
+			overall += vals
+		end
+		createConnections(overall)
 	end
 end
