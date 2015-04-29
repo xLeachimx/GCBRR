@@ -98,7 +98,7 @@ class AssocNetwork
 	# item2 is the name of a node in the network
 	# Postcond:
 	# Returns the activation level of items2 
-	def similarityQuery activationLevel item1 item2
+	def similarityQuery activationLevel, item1, item2
 		return activationLevel if item1 == item2
 		prepSid
 		sid(activationLevel,item1)
