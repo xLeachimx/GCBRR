@@ -17,15 +17,10 @@ attrName-val1,val2,val3,...
 .
 .
 .
-END-CASE
 BEGIN-CASE
 attrName-val1,val2,val3,...
 attrName-val1,val2,val3,...
 attrName-val1,val2,val3,...
-.
-.
-.
-END-CASE
 .
 .
 .

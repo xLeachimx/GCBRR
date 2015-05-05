@@ -74,6 +74,7 @@ class AssocNetwork
 	def initialize
 		@nodes = {}
 		@strongestConnection = 0
+		@avgConnection = nil
 	end
 
 	# Precond:
@@ -108,10 +109,36 @@ class AssocNetwork
 	end
 
 	# Precond:
+	# Postcond:
+	# returns the average connection strength
+	def avgConnection
+		if @avgConnection == nil
+			count = 0
+			total = 0
+			@nodes.each_value do |n|
+				n.connections.each_value do |c|
+					total += c
+					count += 1
+				end
+			end
+			@avgConnection = total/count
+		end
+		return @avgConnection
+	end
+
+	# Precond:
+	# Postcond:
+	# retuns the average connection strength according to SID
+	def avgConnectionSID
+		@strongestConnection - avgConnection() + 1
+	end
+
+	# Precond:
 	# creates connection based on a series of symbols and/or strings in items
 	# Postcond:
 	# Adds connections to the network based on the contents of items.
 	def createConnections items
+		avgConnection = nil
 		items = items.uniq
 		items.each do |item|
 			if !nodeExists(item)
