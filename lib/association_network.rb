@@ -162,6 +162,8 @@ class AssocNetwork
 		contents = fin.read
 		fin.close
 		contents = contents.split("\n")
+		contents.map!{|l| l.strip.upcase}
+		contents.delete_if{|l| l[0] == '#'}
 		contents.map!{|l| l.split(",")}
 		contents.each do |connect|
 			if !nodeExists(connect[0])

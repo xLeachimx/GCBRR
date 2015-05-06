@@ -96,6 +96,7 @@ class Reasoner
 		fin.close
 		contents = contents.split("\n")
 		contents.map!{|l| l.strip.upcase}
+		contents.delete_if{|l| l[0] == '#'}
 		contents = contents.join("\n")
 		contents = contents.split("BEGIN-CASE")
 		contents.map!{|c| c.split("\n")}
