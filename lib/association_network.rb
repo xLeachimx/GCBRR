@@ -73,7 +73,8 @@ class AssocNetwork
 	# creates a blank association network
 	def initialize
 		@nodes = {}
-		@strongestConnection = 1
+		@strongestConnection = 0
+		@avgConnection = nil
 	end
 
 	# Precond:
@@ -108,10 +109,82 @@ class AssocNetwork
 	end
 
 	# Precond:
+	# Postcond:
+	# returns the average connection strength
+	def avgConnection
+		if @avgConnection == nil
+			count = 0
+			total = 0
+			@nodes.each_value do |n|
+				n.connections.each_value do |c|
+					total += c
+					count += 1
+				end
+			end
+			@avgConnection = total/count
+		end
+		return @avgConnection
+	end
+
+	# Precond:
+	# Postcond:
+	# retuns the average connection strength according to SID
+	def avgConnectionSID
+		@strongestConnection - avgConnection() + 1
+	end
+
+	# Precond:
+	# filename is a valid filename
+	# Postcond:
+	# writes the assocNet to the specified file
+	def writeToFile filename
+		contents = ''
+		@nodes.each_value do |n|
+			n.connections.each_value do |c|
+				contents += n.name
+				contents += ','
+				contents += c.join(',')
+				contents += "\n"
+			end
+			cotents += n.name + "\n" if n.connections.size <= 0
+		end
+		fout = File.new(filename,'w')
+		fout.puts contents
+		fout.close
+	end
+
+	# Precond:
+	# filename is a valid filename
+	# Postcond:
+	# reads the assocNet from the specified file
+	def readFromFile filename
+		fin = File.new(filename,'r')
+		contents = fin.read
+		fin.close
+		contents = contents.split("\n")
+		contents.map!{|l| l.strip.upcase}
+		contents.delete_if{|l| l[0] == '#'}
+		contents.map!{|l| l.split(",")}
+		contents.each do |connect|
+			if !nodeExists(connect[0])
+				newNode(connect[0])
+			end
+			if !nodeExists(connect[2])
+				newNode(connect[2])
+			end
+			@nodes[connect[0]].addConnection(connect[2])
+			@nodes[connect[0]].changeConnectionStr(connect[1].to_f)
+			@nodes[connect[2]].addConnection(connect[0])
+			@nodes[connect[2]].changeConnectionStr(connect[1].to_f)			
+		end
+	end
+
+	# Precond:
 	# creates connection based on a series of symbols and/or strings in items
 	# Postcond:
 	# Adds connections to the network based on the contents of items.
 	def createConnections items
+		avgConnection = nil
 		items = items.uniq
 		items.each do |item|
 			if !nodeExists(item)
