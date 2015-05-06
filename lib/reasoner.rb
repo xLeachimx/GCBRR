@@ -2,15 +2,17 @@ require_relative 'association_network'
 
 class Reasoner
 	attr_reader :cases
+	attr_reader :name
 
 	# Precond:
-	# None
+	# name is a valid string
 	# Postcond:
 	# Creates a new reasoner with an empty assoc network
 	# and an empty case library
-	def initialize
+	def initialize name
 		@cases = []
 		@assocNet = AssocNetwork.new
+		@name = name
 	end
 
 	# Precond:
@@ -19,6 +21,34 @@ class Reasoner
 	# adds the cases to both the case library and the association network
 	def loadCasesFromFile filename
 		parseFile(filename)
+	end
+
+	# Precond:
+	# filename is a valid file which adheres to the format of an association network
+	# Postcond:
+	# loads the association network from the file into the assocNet of the reasoner
+	def loadAssocNet filename
+		@assocNet.readFromFile(filename)
+	end
+
+	# Precond:
+	# name is non-blank
+	# Postcond:
+	# returns true if name.net and name.clib are written to
+	def saveReasoner
+		return false if name == nil || name == ''
+		@assocNet.writeToFile(name + '.net')
+		writeCaseLibToFile(name + '.clib')
+	end
+
+	# Precond:
+	# files name.clib and name.net exist
+	# Postcond:
+	# loads the reasoner
+	def loadReasoner
+		return false if name == nil || name == ''
+		loadAssocNet(name + '.net')
+		loadCasesFromFile(name + '.clib')
 	end
 
 	# Precond:
@@ -84,4 +114,20 @@ class Reasoner
 		@assocNet.addCaseLibrary(@cases)
 	end
 
+	# Precond:
+	# none
+	# Postcond:
+	# writes the case library of the reasoner to a file
+	def writeCaseLibToFile filename
+		contents = ''
+		@cases.each do |c|
+			contents += "BEGIN-CASE\n"
+			c.attributes.each_key do |key|
+				contents += (key.to_s + c.attributes[key].join(',') + "\n")
+			end
+		end
+		fout = File.new(filename)
+		fout.puts contents
+		fout.close
+	end
 end
