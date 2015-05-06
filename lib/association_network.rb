@@ -75,6 +75,7 @@ class AssocNetwork
 		@nodes = {}
 		@strongestConnection = 0
 		@avgConnection = nil
+		@lastSIDQuery = [nil,nil]
 	end
 
 	# Precond:
@@ -101,10 +102,17 @@ class AssocNetwork
 	# Returns the activation level of items2 
 	def similarityQuery activationLevel, item1, item2
 		return activationLevel if item1 == item2
-		prepSid
-		sid(activationLevel,item1)
-		result = @nodes[item2].activated
-		result = 0 if result == nil
+		if @lastSIDQuery[0] == item1 && @lastSIDQuery[1] == activationLevel
+			result = @nodes[item2].activated
+			result = 0 if result == nil
+		else
+			prepSid
+			sid(activationLevel,item1)
+			@lastSIDQuery[0] = item1
+			@lastSIDQuery[1] = activationLevel
+			result = @nodes[item2].activated
+			result = 0 if result == nil
+		end
 		return result
 	end
 
